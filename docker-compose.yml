@@ -1,0 +1,93 @@
+version: '3'
+services:
+
+  #PHP Service
+  peakone:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: peakone
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: peakone
+      SERVICE_TAGS: dev
+      DB_CONNECTION: mysql
+      DB_HOST: peakone_db
+      DB_PORT: 3306
+      DB_DATABASE: peakone
+      DB_USERNAME: peakone_user
+      DB_PASSWORD: peakone_db_pass
+    working_dir: /var/www
+    volumes:
+       - ./app:/var/www
+       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - peakone_network
+
+  #Nginx Service
+  peakone_webserver:
+    image: nginx:alpine
+    container_name: peakone_webserver
+    restart: unless-stopped
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - peakone_network
+
+  #MySQL Service
+  peakone_db:
+    image: mysql:8.0-bookworm
+    container_name: peakone_db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: peakone
+      MYSQL_ROOT_PASSWORD: peakone_pass
+      MYSQL_USER: peakone_user
+      MYSQL_PASSWORD: peakone_db_pass
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./dbdata:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - peakone_network
+
+  #Cron Service
+  peakone_cron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: peakone_cron
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: peakone
+      SERVICE_TAGS: dev
+      DB_CONNECTION: mysql
+      DB_HOST: peakone_db
+      DB_PORT: 3306
+      DB_DATABASE: peakone
+      DB_USERNAME: peakone_user
+      DB_PASSWORD: peakone_db_pass
+    volumes:
+      - ./app:/var/www
+    entrypoint: ["/bin/sh", "-c", "while :; do php /var/www/artisan schedule:run; sleep 60; done"]
+    networks:
+      - peakone_network
+
+#Docker Networks
+networks:
+  peakone_network:
+    driver: bridge
+volumes:
+  dbdata:
+    driver: local
