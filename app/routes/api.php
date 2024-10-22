@@ -19,6 +19,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    Route::post('/successful-emails', [SuccessfulEmailController::class, 'store']);
+    Route::get('/successful-emails/{id}', [SuccessfulEmailController::class, 'show']);
+    Route::put('/successful-emails/{id}', [SuccessfulEmailController::class, 'update']);
+    Route::get('/successful-emails', [SuccessfulEmailController::class, 'index']);
+    Route::delete('/successful-emails/{id}', [SuccessfulEmailController::class, 'destroy']);
 });
 
 Route::post('/register', [AuthController::class, 'register']);
