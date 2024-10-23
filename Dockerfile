@@ -51,7 +51,10 @@ RUN chmod 0644 /etc/cron.d/laravel-cron
 RUN touch /var/log/cron.log && chown -f www:www /var/log/cron.log
 
 # Start cron and PHP-FPM together
-CMD cron && php-fpm
+CMD if [ ! -f /var/www/.env ]; then \
+        composer create-project --prefer-dist laravel/laravel .; \
+    fi && \
+    cron && php-fpm
 
 # Expose port 9000
 EXPOSE 9000
