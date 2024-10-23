@@ -14,4 +14,4 @@ build:
 	docker-compose build
 
 open_container:
-	docker exec -it peakone bash
+	docker exec -it laravel_project bash
