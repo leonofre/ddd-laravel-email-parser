@@ -14,4 +14,34 @@
 - MySQL
 - Docker for containerization
 
+## First Usage
+
+### Using Make
+1. Build containers
+ - run `make build`
+2. Start containers
+ - Seeing logs: run `make up`
+ - Hide logs: run `make up_hide`
+
+### Not using Make
+1. Build containers
+ - run `docker-compose build`
+2. Start containers
+ - Seeing logs: run `docker-compose up --remove-orphans`
+ - Hide logs: run `docker-compose up -d --remove-orphans`
+
+## Daily Usage
+
+### Using Make
+1. Stop Container
+ - run `make down`
+2. Access main container
+ - run `make open_container`
+
+### Not using Make
+1. Stop Container
+ - run `docker-compose down`
+2. Access main container
+ - run `docker exec -it laravel_project bash`
+
 Contributions are welcome!
