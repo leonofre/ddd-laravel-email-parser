@@ -20,8 +20,8 @@ services:
       DB_PASSWORD: laravel_project_db_pass
     working_dir: /var/www
     volumes:
-       - ./app:/var/www
-       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./app:/var/www
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - laravel_project_network
 

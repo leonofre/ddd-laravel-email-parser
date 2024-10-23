@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN npm install --global yarn
 
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - 
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash - 
 RUN apt-get install -y nodejs
 
 # Clear cache
@@ -35,11 +35,8 @@ RUN docker-php-ext-install pdo_mysql gd zip
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Add user for Laravel application
-RUN groupadd -g 1000 www && useradd -u 1000 -ms /bin/bash -g www www
-
 # Copy existing application directory contents
-COPY --chown=www:www app /var/www
+COPY --chown=www-data:www-data app /var/www
 
 # Copy cronjob file
 COPY cronjob /etc/cron.d/laravel-cron
@@ -48,7 +45,7 @@ COPY cronjob /etc/cron.d/laravel-cron
 RUN chmod 0644 /etc/cron.d/laravel-cron
 
 # Apply ownership to the log file for cron
-RUN touch /var/log/cron.log && chown -f www:www /var/log/cron.log
+RUN touch /var/log/cron.log && chown -f www-data:www-data /var/log/cron.log
 
 # Start cron and PHP-FPM together
 CMD if [ ! -f /var/www/.env ]; then \
