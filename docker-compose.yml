@@ -22,6 +22,8 @@ services:
     volumes:
       - ./app:/var/www
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    depends_on:
+      - laravel_project_db
     networks:
       - laravel_project_network
 
@@ -60,6 +62,11 @@ services:
       - ./mysql/my.cnf:/etc/mysql/my.cnf
     networks:
       - laravel_project_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "laravel_project_user", "-plaravel_project_db_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   #Cron Service
   laravel_project_cron:
@@ -81,6 +88,9 @@ services:
     volumes:
       - ./app:/var/www
     entrypoint: ["/bin/sh", "-c", "while :; do php /var/www/artisan schedule:run; sleep 60; done"]
+    depends_on:
+      laravel_project_db:
+        condition: service_healthy
     networks:
       - laravel_project_network
 
